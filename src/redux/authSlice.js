@@ -1,78 +1,58 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { signUp, logIn, logOut, refreshUser } from './authOperation';
+import { register, logIn, logOut, refreshUser } from './authOperation';
 
 const initialState = {
-    user: { name: null, email: null },
-    token: null,
-    isAuth: false,
-    isLoggedIn: false,
-    isRefreshing: false,
-    error: null
+  user: { name: null, email: null },
+  token: null,
+  isLoggedIn: false,
+  isRefreshing: false,
+  error: null,
+};
+
+const handlePending = state => {
+  state.isLoading = true;
+  state.error = null;
+};
+
+const handleRejected = (state, { payload }) => {
+  state.isLoading = false;
+  state.error = payload;
 };
 
 const authSlice = createSlice({
-    name: 'auth',
-    initialState,
-    reducers: {
-        clearError(state) {
-            state.error = null
-        }
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(signUp.fulfilled, (state, action) => {
-                state.user = action.payload.user;
-                state.token = action.payload.token;
-                state.isLoggedIn = true;
-                state.isAuth = false;
-            }).addCase(signUp.rejected, (state, action) => {
-                state.error = action.payload
-                state.isAuth = false;
-            })
-            .addCase(signUp.pending, (state) => {
-                state.isAuth = true
-            })
-            .addCase(logIn.fulfilled, (state, action) => {
-                state.user = action.payload.user;
-                state.token = action.payload.token;
-                state.isLoggedIn = true;
-                state.isAuth = false;
-            })
-            .addCase(logIn.rejected, (state, action) => {
-                state.error = action.payload
-                state.isAuth = false;
-            })
-            .addCase(logIn.pending, (state) => {
-                state.isAuth = true
-            })
-            .addCase(logOut.fulfilled, (state) => {
-                state.user = { name: null, email: null };
-                state.token = null;
-                state.isLoggedIn = false;
-                state.isAuth = false;
-            })
-            .addCase(logOut.rejected, (state) => {
-                state.isAuth = false;
-            })
-            .addCase(logOut.pending, (state) => {
-                state.isAuth = true
-            })
-            .addCase(refreshUser.pending, (state) => {
-                state.isRefreshing = true;
-            })
-            .addCase(refreshUser.fulfilled, (state, action) => {
-                state.user = action.payload;
-                state.isLoggedIn = true;
-                state.isRefreshing = false;
-            })
-            .addCase(refreshUser.rejected, (state) => {
-                state.isRefreshing = false;
-            })
+  name: 'auth',
+  initialState,
+  extraReducers: builder => {
+    builder
+      .addCase(register.fulfilled, (state, { payload }) => {
+        state.user = payload.user;
+        state.token = payload.token;
+        state.isLoggedIn = true;
+      })
+      .addCase(logIn.fulfilled, (state, { payload }) => {
+        state.user = payload.user;
+        state.token = payload.token;
+        state.isLoggedIn = true;
+      })
+      .addCase(logOut.fulfilled, state => {
+        state.user = { name: null, email: null };
+        state.token = null;
+        state.isLoggedIn = false;
+      })
+      .addCase(refreshUser.fulfilled, (state, { payload }) => {
+        state.user = payload;
+        state.isLoggedIn = true;
+        state.isRefreshing = false;
+      })
+      .addCase(refreshUser.pending, state => {
+        state.isRefreshing = true;
+      })
+      .addCase(refreshUser.rejected, state => {
+        state.isRefreshing = false;
+      })
+      .addMatcher(action => action.type.endsWith('/pending'), handlePending)
+      .addMatcher(action => action.type.endsWith('/rejected'), handleRejected);
+  },
+});
 
-
-    }
-})
-
-export const { clearError } = authSlice.actions
-
-export default authSlice.reducer;
+export const authReducer = authSlice.reducer;

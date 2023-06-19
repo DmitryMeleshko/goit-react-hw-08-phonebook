@@ -1,19 +1,25 @@
-export const selectFilter = state => state.filter;
+import { createSelector } from '@reduxjs/toolkit';
 
-export const selectIsLoggedIn = state => state.auth.isLoggedIn;
-
-export const selectIsAuth = state => state.auth.isAuth
+export const selectIsLoggedIn = state => state.auth.selectIsLoggedIn;
 
 export const selectUser = state => state.auth.user;
 
 export const selectIsRefreshing = state => state.auth.isRefreshing;
 
-export const selectError = state => state.auth.error;
+export const selectContacts = state => state.contacts.items;
+export const selectFilter = state => state.filter;
+export const selectLoading = state => state.isLoading;
+export const selectError = state => state.contacts.error;
 
-export const selectIsDrawerOpen = state => state.modal.isDrawerOpen;
+const getFilter = state => state.filter;
+const getContacts = state => state.contacts.items;
 
-export const selectIsDialogOpen = state => state.modal.isDialogOpen;
-
-export const selectDrawerVariant = state => state.modal.variant;
-
-export const selectIdToEdit = state => state.modal.idToEdit;
+export const getFilteredContacts = createSelector(
+  [getContacts, getFilter],
+  (contacts, filter) => {
+    if (!contacts) return;
+    return contacts.filter(item =>
+      item.name.toLowerCase().trim().includes(filter.toLowerCase().trim())
+    );
+  }
+);
