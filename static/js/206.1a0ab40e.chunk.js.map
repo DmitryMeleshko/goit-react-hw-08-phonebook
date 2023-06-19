@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/206.1a0ab40e.chunk.js","mappings":"uMAAe,SAASA,IACpB,OACI,4BACI,0CACA,iDAGX,C","sources":["pages/HomePage.js"],"sourcesContent":["export default function Home() {\n    return (\n        <div>\n            <h1>Contact book</h1>\n            <p>Welcome to our app!</p>\n        </div>\n    );\n}"],"names":["Home"],"sourceRoot":""}
